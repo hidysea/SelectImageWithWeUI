@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>请选择3-5张照片</title>
+    <title>Select Image</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <!-- Add your keywords and description here for SEO. -->
     <meta name="keywords" content="">
@@ -46,10 +46,11 @@
 <script src="javascripts/jquery.min.js"></script>
 
 <script>
-    // 全局的 imgFiles 存储选择的图片文件
-    var imgFiles = [];
-    $(function () {
 
+    var imgFiles = []; // 全局的 imgFiles 存储选择的图片文件
+    var imgCountMax = 5; // 最多添加多少张照片
+
+    $(function () {
         var input = $("#input")[0]; // input 控件
         $(document).on("change","#input",function () {
             imagePreview(input);
@@ -86,8 +87,12 @@
                 continue;
             }
             var imgUrl = getObjectURL(file);
+
+            // '<img src="'+imgUrl+'"/>'; // img source
             // console.log(imgUrl);
-            var row = '<div class="clearfix">' +
+
+            // 向table添加一行row
+            var row = '<div class="clearfix" id="tablerow">' +
                     '<div class="cell_img">' +
                     '<img class="weui_uploader_file" src="' + imgUrl + '""></img>' +
                     '</div>' +
@@ -97,11 +102,11 @@
                     '<div class="weui_textarea_counter"><span>0</span>/50</div>' +
                     '</div>' +
                     '</div>';
-//                    '<img src="'+imgUrl+'"/>';
             tableView.append(row);
 
+            // 最多添加 imgCountMax 张照片
             console.log(imgFiles.length);
-            if (imgFiles.length >= 5) {
+            if (imgFiles.length >= imgCountMax) {
                 $("#inputDiv").hide();
                 break;
             }
