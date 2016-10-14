@@ -28,10 +28,9 @@
         <div class="bd">
             <div class="cDiv" id="tableView"></div>
 
-            <div class="cDiv clearfix">
+            <div class="cDiv clearfix" id="inputDiv">
                 <div class="weui_uploader_input_wrp">
-                    <input class="weui_uploader_input" id="input" type="file" accept="image/*" multiple="multiple"
-                           onchange="imagePreview(this)"/>
+                    <input class="weui_uploader_input" id="input" type="file" accept="image/*" multiple="multiple" />
                 </div>
             </div>
         </div>
@@ -45,11 +44,25 @@
 </body>
 
 <script src="javascripts/jquery.min.js"></script>
+
 <script>
+    var imgFiles = []; // 全局的 imgFiles 存储选择的图片文件
     // 输入框文字长度
     $(function () {
+
+        var input = $("#input")[0]; // input 控件
+        $(document).on("change","#input",function () {
+            imagePreview(input);
+        });
+
         $(document).on("keyup",".weui_textarea",function () {
+            var maxLength = 50;
             var len = $(this).val().length;
+            if (len > maxLength) {
+                $(this).val($(this).val().substring(0, maxLength));
+                len = maxLength;
+            };
+
             $(this).parent().find("span").text(len);
         });
     });
@@ -64,6 +77,8 @@
 
         for (var i = 0; i < files.length; i++) {//预览新添加的图片
             var file = files[i];
+            imgFiles.push(file);
+
             var imageType = /^image\//;
             if (!imageType.test(file.type)) {
                 alert("请选择图片类型文件");
@@ -81,10 +96,21 @@
                     '</div>' +
                     '</div>';
 //                    '<img src="'+imgUrl+'"/>';
-
-//            console.log(i);
             tableView.append(row);
+
+            console.log(imgFiles.length);
+            if (imgFiles.length >= 5) {
+                $("#inputDiv").hide();
+                break;
+            }
         }
+
+        // 每次添加完图片之后 替换一个新的 input
+        // input 选择的文件与前一次选择的完全相同时, 将不会触发 onchange 事件
+        var inputDivHtml='<div class="weui_uploader_input_wrp">'+
+                '<input class="weui_uploader_input" id="input" type="file" accept="image/*" multiple="multiple" />'+
+                '</div>';
+        $("#inputDiv").html(inputDivHtml);
     }
 
     function getObjectURL(file) {
