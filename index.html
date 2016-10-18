@@ -38,7 +38,7 @@
 </div>
 
 <div class="bottom_tab">
-    <a href="javascript:;" class="weui_btn weui_btn_primary" id="preview">预览</a>
+    <a href="javascript:;" class="weui_btn weui_btn_disabled weui_btn_primary" id="preview">预览</a>
     <a href="javascript:;" class="weui_btn weui_btn_disabled weui_btn_primary" id="release">发布</a>
 </div>
 </body>
@@ -69,16 +69,18 @@
         });
 
         $(document).on("click","#preview",function () {
-            var imgs = [];
-            $(".imgRow").each(function () {
-                var imgObj={};
-                imgObj.imgUrl= $(this).find(".weui_uploader_file").attr("src");
-                imgObj.imgDescr=$(this).find(".weui_textarea").val();
-                imgs.push(imgObj);
-            })
+            if (imgFiles.length > 0) {
+                var imgs = [];
+                $(".imgRow").each(function () {
+                    var imgObj={};
+                    imgObj.imgUrl=$(this).find(".weui_uploader_file").attr("src");
+                    imgObj.imgDescr=$(this).find(".weui_textarea").val();
+                    imgs.push(imgObj);
+                })
 
-            localStorage.setItem("imgs",JSON.stringify(imgs));
-            window.location.href = "preview.html";
+                localStorage.setItem("imgs",JSON.stringify(imgs));
+                window.location.href = "preview.html";
+            }
         })
     });
 
@@ -113,6 +115,7 @@
             if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
                 var reader = new FileReader();
                 reader.addEventListener("load", function () {
+
                     var imgSrc = this.result;
 
                     // 向 listView 添加一行 row
@@ -128,16 +131,26 @@
                             '</div>';
                     listView.append(row);
                 }, false);
+
                 reader.readAsDataURL(file);
             }
         }
 
+        toggleBtnDisable();
         // 每次添加完图片之后 替换一个新的 input
         // input 选择的文件与前一次选择的完全相同时, 将不会触发 onchange 事件
         var inputDivHtml='<div class="weui_uploader_input_wrp">'+
                 '<input class="weui_uploader_input" id="input" type="file" accept="image/*" multiple="multiple" />'+
                 '</div>';
         $("#inputDiv").html(inputDivHtml);
+    }
+
+    function toggleBtnDisable() {
+        if (imgFiles.length > 0 && $("#preview").hasClass("weui_btn_disabled")) {
+            $("#preview").removeClass("weui_btn_disabled");
+        } else {
+            $("#preview").addClass("weui_btn_disabled");
+        }
     }
 
     // 根据 file 获取 imgUrl
