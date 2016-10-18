@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>预览</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="WeUI/style/weui.css"/>
+    <link rel="stylesheet" href="WeUI/example/example.css">
+    <link rel="stylesheet" href="styles/bundle.css"/>
+</head>
+<body>
+<div class="cDiv" id="listView"></div>
+</body>
+
+<script src="javascripts/jquery.min.js"></script>
+<script>
+    $(function () {
+        var imgs = JSON.parse(localStorage.getItem("imgs"));
+        console.log(imgs);
+
+        var listView = $("#listView");
+        for (var i = 0; i < imgs.length; i++) {
+            var imgUrl = imgs[i].imgUrl;
+            var imgDescr = imgs[i].imgDescr;
+            // $("#img" + i).attr("src",imgUrl);
+            // 向 listView 添加一行 row
+            var row = '<div class="clearfix tablerow">' +
+                    '<div class="cell_img">' +
+                    '<img class="weui_uploader_file" src="' + imgUrl + '""></img>' +
+                    '</div>' +
+                    '<div class="cell_text">' +
+                    '<textarea class="weui_textarea" placeholder="点击输入描述" rows="3""> ' +
+                    imgDescr +
+                    '</textarea>' +
+                    '<div class="weui_textarea_counter"><span>0</span>/50</div>' +
+                    '</div>' +
+                    '</div>';
+            listView.append(row);
+        }
+    });
+</script>
+</html>

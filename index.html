@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Select Image</title>
+    <title>选择</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <!-- Add your keywords and description here for SEO. -->
     <meta name="keywords" content="">
@@ -17,7 +17,7 @@
 <body>
 
 <!--<a href="#" class="file" style="text-align: center">选择照片-->
-<!--<input class="file" id="input" type="file" accept="image/*" name="img" multiple="multiple" onchange="imagePreview(this)" />-->
+<!--<input class="file" id="input" type="file" accept="image/*" name="img" multiple="multiple" onchange="showImage(this)" />-->
 <!--</a>-->
 
 <div class="table_container" id="table_container">
@@ -26,7 +26,7 @@
             <h1 class="page_title" style="color: #3cc51f">选择3-5张照片</h1>
         </div>
         <div class="bd">
-            <div class="cDiv" id="tableView"></div>
+            <div class="cDiv" id="listView"></div>
 
             <div class="cDiv clearfix" id="inputDiv">
                 <div class="weui_uploader_input_wrp">
@@ -38,8 +38,8 @@
 </div>
 
 <div class="bottom_tab">
-    <a href="javascript:;" class="weui_btn weui_btn_primary">预览</a>
-    <a href="javascript:;" class="weui_btn weui_btn_disabled weui_btn_primary">发布</a>
+    <a href="javascript:;" class="weui_btn weui_btn_primary" id="preview">预览</a>
+    <a href="javascript:;" class="weui_btn weui_btn_disabled weui_btn_primary" id="release">发布</a>
 </div>
 </body>
 
@@ -53,7 +53,7 @@
     $(function () {
         var input = $("#input")[0]; // input 控件
         $(document).on("change","#input",function () {
-            imagePreview(input);
+            showImage(input);
         });
 
         $(document).on("keyup",".weui_textarea",function () {
@@ -67,48 +67,68 @@
 
             $(this).parent().find("span").text(len);
         });
+
+        $(document).on("click","#preview",function () {
+            var imgs = [];
+            $(".imgRow").each(function () {
+                var imgObj={};
+                imgObj.imgUrl= $(this).find(".weui_uploader_file").attr("src");
+                imgObj.imgDescr=$(this).find(".weui_textarea").val();
+                imgs.push(imgObj);
+            })
+
+            localStorage.setItem("imgs",JSON.stringify(imgs));
+            window.location.href = "preview.html";
+        })
     });
 
     /**
      *图片预览
      */
-    function imagePreview(input) {
+    function showImage(input) {
         var files = input.files;
-        // 假设 "tableView" 是将要展示图片的 div
-        var tableView = $("#tableView");
 
-        for (var i = 0; i < files.length; i++) {//预览新添加的图片
+        for (var i = 0; i < files.length; i++) {//新添加的图片
             var file = files[i];
             imgFiles.push(file);
-
-            var imageType = /^image\//;
-            if (!imageType.test(file.type)) {
-                alert("请选择图片类型文件");
-                continue;
-            }
-            var imgUrl = getObjectURL(file);
-
-            // '<img src="'+imgUrl+'"/>'; // img source
-            // console.log(imgUrl);
-
-            // 向table添加一行row
-            var row = '<div class="clearfix" id="tablerow">' +
-                    '<div class="cell_img">' +
-                    '<img class="weui_uploader_file" src="' + imgUrl + '""></img>' +
-                    '</div>' +
-                    '<div class="cell_text">' +
-                    '<textarea class="weui_textarea" placeholder="点击输入描述" rows="3"">' +
-                    '</textarea>' +
-                    '<div class="weui_textarea_counter"><span>0</span>/50</div>' +
-                    '</div>' +
-                    '</div>';
-            tableView.append(row);
 
             // 最多添加 imgCountMax 张照片
             console.log(imgFiles.length);
             if (imgFiles.length >= imgCountMax) {
                 $("#inputDiv").hide();
                 break;
+            }
+        }
+
+        // 假设 "listView" 是将要展示图片的 div
+        var listView = $("#listView");
+
+        for (var i = 0; i < imgFiles.length; i++) {//预览新添加的图片
+            var file = imgFiles[i];
+
+            // 通过 file 获取img 路径
+            // var  imgSrc = getObjectURL(file);
+
+            // Make sure `file.name` matches our extensions criteria
+            if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
+                var reader = new FileReader();
+                reader.addEventListener("load", function () {
+                    var imgSrc = this.result;
+
+                    // 向 listView 添加一行 row
+                    var row = '<div class="imgRow clearfix">' +
+                            '<div class="cell_img">' +
+                            '<img class="weui_uploader_file" src="' + imgSrc + '""></img>' +
+                            '</div>' +
+                            '<div class="cell_text">' +
+                            '<textarea class="weui_textarea" placeholder="点击输入描述" rows="3"">' +
+                            '</textarea>' +
+                            '<div class="weui_textarea_counter"><span>0</span>/50</div>' +
+                            '</div>' +
+                            '</div>';
+                    listView.append(row);
+                }, false);
+                reader.readAsDataURL(file);
             }
         }
 
@@ -120,6 +140,7 @@
         $("#inputDiv").html(inputDivHtml);
     }
 
+    // 根据 file 获取 imgUrl
     function getObjectURL(file) {
         var url = null;
         if (window.createObjectURL != undefined) { // basic
