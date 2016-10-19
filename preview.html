@@ -9,35 +9,27 @@
 
     <link rel="stylesheet" href="WeUI/style/weui.css"/>
     <link rel="stylesheet" href="WeUI/example/example.css">
-    <link rel="stylesheet" href="styles/bundle.css"/>
+    <link rel="stylesheet" href="css/bundle.css"/>
 </head>
 <body>
 <div class="cDiv" id="listView"></div>
 </body>
 
-<script src="javascripts/jquery.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/index.js"></script>
+
 <script>
     $(function () {
-        var imgs = JSON.parse(localStorage.getItem("imgs"));
-        console.log(imgs);
+        var imgList = JSON.parse(localStorage.getItem("imgList"));
+        console.log(imgList);
 
         var listView = $("#listView");
-        for (var i = 0; i < imgs.length; i++) {
-            var imgUrl = imgs[i].imgUrl;
-            var imgDescr = imgs[i].imgDescr;
-            // $("#img" + i).attr("src",imgUrl);
+        for (var i = 0; i < imgList.length; i++) {
+            var imgUrl = imgList[i].imgUrl;
+            var imgDescr = imgList[i].imgDescr;
+
             // 向 listView 添加一行 row
-            var row = '<div class="clearfix tablerow">' +
-                    '<div class="cell_img">' +
-                    '<img class="weui_uploader_file" src="' + imgUrl + '""></img>' +
-                    '</div>' +
-                    '<div class="cell_text">' +
-                    '<textarea class="weui_textarea" placeholder="点击输入描述" rows="3""> ' +
-                    imgDescr +
-                    '</textarea>' +
-                    '<div class="weui_textarea_counter"><span>0</span>/50</div>' +
-                    '</div>' +
-                    '</div>';
+            var row = getImageRow(imgUrl,imgDescr);
             listView.append(row);
         }
     });
