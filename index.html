@@ -10,11 +10,12 @@
 
     <link rel="stylesheet" href="WeUI/style/weui.css"/>
     <link rel="stylesheet" href="WeUI/example/example.css">
-    <link rel="stylesheet" href="styles/bundle.css"/>
+    <link rel="stylesheet" href="css/bundle.css"/>
 
 </head>
 
 <body>
+
 
 <!--<a href="#" class="file" style="text-align: center">选择照片-->
 <!--<input class="file" id="input" type="file" accept="image/*" name="img" multiple="multiple" onchange="imagesChanged(this)" />-->
@@ -43,129 +44,8 @@
 </div>
 </body>
 
-<script src="javascripts/jquery.min.js"></script>
-
-<script>
-
-    var imgFiles = []; // 全局的 imgFiles 存储选择的图片文件
-    var imgCountMax = 5; // 最多添加多少张照片
-
-    $(function () {
-        var input = $("#input")[0]; // input 控件
-        $(document).on("change","#input",function () {
-            imagesChanged(input);
-        });
-
-        $(document).on("keyup",".weui_textarea",function () {
-            // 输入框文字长度
-            var maxLength = 50;
-            var len = $(this).val().length;
-            if (len > maxLength) {
-                $(this).val($(this).val().substring(0, maxLength));
-                len = maxLength;
-            };
-
-            $(this).parent().find("span").text(len);
-        });
-
-        $(document).on("click","#preview",function () {
-            if (imgFiles.length > 0) {
-                var imgs = [];
-                $(".imgRow").each(function () {
-                    var imgObj={};
-                    imgObj.imgUrl=$(this).find(".weui_uploader_file").attr("src");
-                    imgObj.imgDescr=$(this).find(".weui_textarea").val();
-                    imgs.push(imgObj);
-                })
-
-                localStorage.setItem("imgs",JSON.stringify(imgs));
-                window.location.href = "preview.html";
-            }
-        })
-    });
-
-    /**
-     *图片预览
-     */
-    function imagesChanged(input) {
-        var files = input.files;
-
-        for (var i = 0; i < files.length; i++) {//新添加的图片
-            var file = files[i];
-            imgFiles.push(file);
-
-            // 最多添加 imgCountMax 张照片
-            console.log(imgFiles.length);
-            if (imgFiles.length >= imgCountMax) {
-                $("#inputDiv").hide();
-                break;
-            }
-        }
-
-        // 假设 "listView" 是将要展示图片的 div
-        var listView = $("#listView");
-
-        for (var i = 0; i < imgFiles.length; i++) {//预览新添加的图片
-            var file = imgFiles[i];
-
-            // 通过 file 获取img 路径
-            // var  imgSrc = getObjectURL(file);
-
-            // Make sure `file.name` matches our extensions criteria
-            if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
-                var reader = new FileReader();
-                reader.addEventListener("load", function () {
-
-                    var imgSrc = this.result;
-
-                    // 向 listView 添加一行 row
-                    var row = '<div class="imgRow clearfix">' +
-                            '<div class="cell_img">' +
-                            '<img class="weui_uploader_file" src="' + imgSrc + '""></img>' +
-                            '</div>' +
-                            '<div class="cell_text">' +
-                            '<textarea class="weui_textarea" placeholder="点击输入描述" rows="3"">' +
-                            '</textarea>' +
-                            '<div class="weui_textarea_counter"><span>0</span>/50</div>' +
-                            '</div>' +
-                            '</div>';
-                    listView.append(row);
-                }, false);
-
-                reader.readAsDataURL(file);
-            }
-        }
-
-        toggleBtnDisable();
-        // 每次添加完图片之后 替换一个新的 input
-        // input 选择的文件与前一次选择的完全相同时, 将不会触发 onchange 事件
-        var inputDivHtml='<div class="weui_uploader_input_wrp">'+
-                '<input class="weui_uploader_input" id="input" type="file" accept="image/*" multiple="multiple" />'+
-                '</div>';
-        $("#inputDiv").html(inputDivHtml);
-    }
-
-    function toggleBtnDisable() {
-        if (imgFiles.length > 0 && $("#preview").hasClass("weui_btn_disabled")) {
-            $("#preview").removeClass("weui_btn_disabled");
-        } else {
-            $("#preview").addClass("weui_btn_disabled");
-        }
-    }
-
-    // 根据 file 获取 imgUrl
-    function getObjectURL(file) {
-        var url = null;
-        if (window.createObjectURL != undefined) { // basic
-            url = window.createObjectURL(file);
-        } else if (window.URL != undefined) { // mozilla(firefox)
-            url = window.URL.createObjectURL(file);
-        } else if (window.webkitURL != undefined) { // webkit or chrome
-            url = window.webkitURL.createObjectURL(file);
-        }
-        return url;
-    }
-
-</script>
+<script src="js/jquery.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/index.js"></script>
 
 </html>
