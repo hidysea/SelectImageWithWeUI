@@ -1,4 +1,4 @@
-# SelectImageWithDescription
+# SelectImageWithWeUI
 基于微信风格的选择图片并添加描述。
 
 ###选择相同文件不显示的问题
