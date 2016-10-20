@@ -35,7 +35,7 @@ $(function () {
             localStorage.setItem("imgList",JSON.stringify(imgList));
 
             // window.location.href = "preview.html";
-            window.location.href = "boilerplate/index.html";
+            window.location.href = "../template/index.html";
         }
     })
 });
