@@ -32,10 +32,9 @@ $(function () {
                 imgObj.imgDescr=$(this).find(".weui_textarea").val();
                 imgList.push(imgObj);
             })
-
             localStorage.setItem("imgList",JSON.stringify(imgList));
-            // window.location.href = "preview.html";
 
+            // window.location.href = "preview.html";
             window.location.href = "boilerplate/index.html";
         }
     })
@@ -91,11 +90,7 @@ function imagesChanged(input) {
             break;
         }
     }
-
-    for (var i = 0; i < imgFiles.length; i++) {
-
-    }
-
+    // 切换 preview 按钮状态
     togglePreviewBtnDisable();
 
     // 每次添加完图片之后 替换一个新的 input
