@@ -4,10 +4,11 @@
 
 var imgFiles = []; // 全局的 imgFiles 存储选择的图片文件
 var imgCountMax = 5; // 最多添加多少张照片
+imgCountMax = 10;
 
 $(function () {
-    var input = $("#input")[0]; // input 控件
     $(document).on("change","#input",function () {
+        var input = $(this)[0]; // input 控件
         imagesChanged(input);
     });
 
@@ -33,7 +34,9 @@ $(function () {
             })
 
             localStorage.setItem("imgList",JSON.stringify(imgList));
-            window.location.href = "preview.html";
+            // window.location.href = "preview.html";
+
+            window.location.href = "boilerplate/index.html";
         }
     })
 });
@@ -44,49 +47,53 @@ $(function () {
 function imagesChanged(input) {
     var files = input.files;
 
-    for (var i = 0; i < files.length; i++) {//新添加的图片
+    // 假设 "listView" 是将要展示图片的 div
+    var listView = $("#listView");
+
+    for (var i = 0; i < files.length; i++) { //新添加的图片
         var file = files[i];
         imgFiles.push(file);
 
+        // Make sure `file.name` matches our extensions criteria
+        if ( !/\.(jpe?g|png|gif)$/i.test(file.name) ) {
+            continue;
+        }
+
+        // 已知三种获取 imgSrc 的方法
+        // // (1)通过 file 获取 img 路径 (刷新后失效)
+        // var  imgSrc = getObjectURL(file);
+        // var imgRow = getImageRow(imgSrc);
+        // listView.append(imgRow);
+
+        // // (2)异步获取图片 (不能按顺序显示)
+        // var reader = new FileReader();
+        // reader.addEventListener("load", function () {
+        //     var imgSrc = this.result;
+        //     var imgRow = getImageRow(imgSrc);
+        //     listView.append(imgRow);
+        // }, false);
+        // reader.readAsDataURL(file);
+
+        // (3)同步获取图片 (data 数据不会失效,同步数据 顺序显示)
+        var syncWorker = new Worker("js/syncWorker.js");
+        if (syncWorker) {
+            syncWorker.addEventListener("message",function (e) {
+                var imgSrc = e.data.result;
+                var imgRow = getImageRow(imgSrc,"");
+                listView.append(imgRow);
+            });
+            syncWorker.postMessage(file);
+        }
+
         // 最多添加 imgCountMax 张照片
-        // console.log(imgFiles.length);
         if (imgFiles.length >= imgCountMax) {
             $("#inputDiv").hide();
             break;
         }
     }
 
-    // 假设 "listView" 是将要展示图片的 div
-    var listView = $("#listView");
-
     for (var i = 0; i < imgFiles.length; i++) {
-        var file = imgFiles[i];
 
-        // 通过 file 获取 img 路径
-        // var  imgSrc = getObjectURL(file);
-
-        // Make sure `file.name` matches our extensions criteria
-        if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
-            // 同步获取图片
-            var syncWorker = new Worker("js/syncWorker.js");
-            if (syncWorker) {
-                syncWorker.addEventListener("message",function (e) {
-                    var imgSrc = e.data.result;
-                    var imgRow = getImageRow(imgSrc,"");
-                    listView.append(imgRow);
-                });
-                syncWorker.postMessage(file);
-            }
-
-//                // 异步获取图片
-//                var reader = new FileReader();
-//                reader.addEventListener("load", function () {
-//                    var imgSrc = this.result;
-//                    var imgRow = getImageRow(imgSrc);
-//                    listView.append(imgRow);
-//                }, false);
-//                reader.readAsDataURL(file);
-        }
     }
 
     togglePreviewBtnDisable();
